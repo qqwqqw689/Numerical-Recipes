@@ -6,6 +6,9 @@
 //#define _USENRERRORCLASS_ 1
 //#define _TURNONFPES_ 1
 
+// _CHECKBOUNDS_  : If defined, it will check boundary.
+// _USESTDVECTOR_ : If defined, it will use standard vector in c++.
+
 // all the system #include's we'll ever need
 #include <fstream>
 #include <cmath>
@@ -175,6 +178,7 @@ if (i<0 || i>=nn) {
 	return v[i];
 }
 
+// the constant object would be using the constant method
 template <class T>
 inline const T & NRvector<T>::operator[](const int i) const	//subscripting
 {
