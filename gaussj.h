@@ -3,10 +3,11 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 	Int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	Doub big,dum,pivinv;
 	VecInt indxc(n),indxr(n),ipiv(n);
-	for (j=0;j<n;j++) ipiv[j]=0;
-	for (i=0;i<n;i++) {
+	// These integer arrays are used for bookkeeping on the pivoting.
+	for (j=0;j<n;j++) ipiv[j]=0; 
+	for (i=0;i<n;i++) { // // This is the main loop over the columns to be reduced.
 		big=0.0;
-		for (j=0;j<n;j++)
+		for (j=0;j<n;j++) // this is the outer loop of the search for a pivot element.
 			if (ipiv[j] != 1)
 				for (k=0;k<n;k++) {
 					if (ipiv[k] == 0) {
@@ -18,6 +19,7 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 					}
 				}
 		++(ipiv[icol]);
+		// We 
 		if (irow != icol) {
 			for (l=0;l<n;l++) SWAP(a[irow][l],a[icol][l]);
 			for (l=0;l<m;l++) SWAP(b[irow][l],b[icol][l]);
