@@ -1,5 +1,8 @@
 void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 {
+	// the input matrix is a[0..n-1][0..n-1], b[0..n-1][0..m-1].
+	// simply picking the largest(in magnitude) available element as pivot
+	// is a very good choice.
 	Int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	Doub big,dum,pivinv;
 	VecInt indxc(n),indxr(n),ipiv(n);
@@ -19,18 +22,24 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 					}
 				}
 		++(ipiv[icol]);
-		// We 
+		// We  now have the pivot element, so we interchange rows, if indeed, to put the pivot
+		// element on the diagonal.
 		if (irow != icol) {
 			for (l=0;l<n;l++) SWAP(a[irow][l],a[icol][l]);
 			for (l=0;l<m;l++) SWAP(b[irow][l],b[icol][l]);
 		}
 		indxr[i]=irow;
+		// the row in which that pivot element was originally located.
 		indxc[i]=icol;
+		// the column of the (i+1)th pivot element, is the (i+1)th the column
+		// that is reduced.
 		if (a[icol][icol] == 0.0) throw("gaussj: Singular Matrix");
+		// We are now ready to divide the pivot row by the pivot element.
 		pivinv=1.0/a[icol][icol];
 		a[icol][icol]=1.0;
 		for (l=0;l<n;l++) a[icol][l] *= pivinv;
 		for (l=0;l<m;l++) b[icol][l] *= pivinv;
+		// Next, we reduce the rows expect for the pivot one, of course.
 		for (ll=0;ll<n;ll++)
 			if (ll != icol) {
 				dum=a[ll][icol];
@@ -46,8 +55,9 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 	}
 }
 
+// Overloaded version with no right-hand sides.
 void gaussj(MatDoub_IO &a)
 {
-	MatDoub b(a.nrows(),0);
+	MatDoub b(a.nrows(),0); // Dummy vector with zero columns.
 	gaussj(a,b);
 }
