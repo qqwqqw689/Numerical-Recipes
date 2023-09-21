@@ -1,3 +1,5 @@
+#include "nr3.h"
+
 void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 {
 	// the input matrix is a[0..n-1][0..n-1], b[0..n-1][0..m-1].
@@ -48,6 +50,8 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 				for (l=0;l<m;l++) b[ll][l] -= b[icol][l]*dum;
 			}
 	}
+	// interchanging pairs of column in the reverse order that the
+	// permutation was built up.
 	for (l=n-1;l>=0;l--) {
 		if (indxr[l] != indxc[l])
 			for (k=0;k<n;k++)
@@ -56,6 +60,7 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 }
 
 // Overloaded version with no right-hand sides.
+// Replaces a by its inverse. 
 void gaussj(MatDoub_IO &a)
 {
 	MatDoub b(a.nrows(),0); // Dummy vector with zero columns.

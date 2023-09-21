@@ -230,8 +230,8 @@ NRvector<T>::~NRvector()
 template <class T>
 class NRmatrix {
 private:
-	int nn;
-	int mm;
+	int nn; // Number of rows
+	int mm; // Number of columns
 	T **v;
 public:
 	NRmatrix();
@@ -258,6 +258,7 @@ NRmatrix<T>::NRmatrix(int n, int m) : nn(n), mm(m), v(n>0 ? new T*[n] : NULL)
 {
 	int i,nel=m*n;
 	if (v) v[0] = nel>0 ? new T[nel] : NULL;
+	// if (v) v[0] = (nel>0 ? new T[nel] : NULL);
 	for (i=1;i<n;i++) v[i] = v[i-1] + m;
 }
 
