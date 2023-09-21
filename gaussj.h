@@ -5,6 +5,8 @@ void gaussj(MatDoub_IO &a, MatDoub_IO &b)
 	// the input matrix is a[0..n-1][0..n-1], b[0..n-1][0..m-1].
 	// simply picking the largest(in magnitude) available element as pivot
 	// is a very good choice.
+	// The matrix inverse of A is gradually built up in A
+	// as the original A is destoryed.
 	Int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	Doub big,dum,pivinv;
 	VecInt indxc(n),indxr(n),ipiv(n);
