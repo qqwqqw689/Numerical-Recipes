@@ -1,27 +1,35 @@
+#include "nr3.h"
+
 struct LUdcmp
+// object for solving linear equations A*x=b using LU decomposition, and related functions.
 {
 	Int n;
 	MatDoub lu; // stores the decomposition
-	VecInt indx;
-	Doub d;
-	LUdcmp(MatDoub_I &a);
-	void solve(VecDoub_I &b, VecDoub_O &x);
-	void solve(MatDoub_I &b, MatDoub_O &x);
-	void inverse(MatDoub_O &ainv);
-	Doub det();
-	void mprove(VecDoub_I &b, VecDoub_IO &x);
-	MatDoub_I &aref;
+	VecInt indx; // stores the row permutation effected by the parital pivoting.
+	Doub d; // used by det
+	// d is output as +/-1 depending on whether the number of row interchanges
+	// was even or odd;
+	LUdcmp(MatDoub_I &a); // constructor.argument is the matrix A.
+	void solve(VecDoub_I &b, VecDoub_O &x); // slove for a single right-hand side.
+	void solve(MatDoub_I &b, MatDoub_O &x); // solve for multiple right-hand sides
+	void inverse(MatDoub_O &ainv); // calculate matrix inverse
+	Doub det(); // return the determinant of A
+	void mprove(VecDoub_I &b, VecDoub_IO &x); // 
+	MatDoub_I &aref; // used only by mprove
 };
 LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
-	const Doub TINY=1.0e-40;
+	// a : a matrix a[0..n-1][0..n-1];
+	// this routine replaces it by the LU decomposition of a rowwise permutation of itself;
+	const Doub TINY=1.0e-40; // a small number
 	Int i,imax,j,k;
 	Doub big,temp;
-	VecDoub vv(n);
-	d=1.0;
+	VecDoub vv(n); // vv stores the implicit scaling of each row.
+	d=1.0; // no row interchanges yet.
+	// one additional wrinkle:
 	for (i=0;i<n;i++) {
 		big=0.0;
 		for (j=0;j<n;j++)
-			if ((temp=abs(lu[i][j])) > big) big=temp;
+			if ((temp=abs(lu[i][j])) > big) big=temp; // the largest element in each row
 		if (big == 0.0) throw("Singular matrix in LUdcmp");
 		vv[i]=1.0/big;
 	}
@@ -41,8 +49,8 @@ LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
 				lu[imax][j]=lu[k][j];
 				lu[k][j]=temp;
 			}
-			d = -d;
-			vv[imax]=vv[k];
+			d = -d; // change the parity of d
+			vv[imax]=vv[k]; // 
 		}
 		indx[k]=imax;
 		if (lu[k][k] == 0.0) lu[k][k]=TINY;
@@ -53,6 +61,7 @@ LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
 		}
 	}
 }
+
 void LUdcmp::solve(VecDoub_I &b, VecDoub_O &x)
 {
 	Int i,ii=0,ip,j;
