@@ -64,6 +64,9 @@ LUdcmp::LUdcmp(MatDoub_I &a) : n(a.nrows()), lu(a), aref(a), indx(n) {
 
 void LUdcmp::solve(VecDoub_I &b, VecDoub_O &x)
 {
+	// sloves the set of n linear equation A*x = b.
+	// b[0..n-1] is input as the right-hand side vector b.
+	// x returns the solution vector x.
 	Int i,ii=0,ip,j;
 	Doub sum;
 	if (b.size() != n || x.size() != n)
@@ -73,21 +76,24 @@ void LUdcmp::solve(VecDoub_I &b, VecDoub_O &x)
 		ip=indx[i];
 		sum=x[ip];
 		x[ip]=x[i];
-		if (ii != 0)
+		if (ii != 0) // when ii is set to a positive value, it will become the index of the first nonvanishing element of b.
 			for (j=ii-1;j<i;j++) sum -= lu[i][j]*x[j];
-		else if (sum != 0.0)
+		else if (sum != 0.0) // a nonzero element was encountered,so from now on we will
 			ii=i+1;
 		x[i]=sum;
 	}
 	for (i=n-1;i>=0;i--) {
 		sum=x[i];
 		for (j=i+1;j<n;j++) sum -= lu[i][j]*x[j];
-		x[i]=sum/lu[i][i];
+		x[i]=sum/lu[i][i]; // store a component of the solution vector X.
 	}
 }
 
 void LUdcmp::solve(MatDoub_I &b, MatDoub_O &x)
 {
+	// solves m sets of n linear equations A*X=B.
+	// the matrix b[0..n-1][0..m-1] inputs the right-hand sides.
+	// x[0..n-1][0..m-1] returns the solution.
 	int i,j,m=b.ncols();
 	if (b.nrows() != n || x.nrows() != n || b.ncols() != x.ncols())
 		throw("LUdcmp::solve bad sizes");
@@ -100,6 +106,7 @@ void LUdcmp::solve(MatDoub_I &b, MatDoub_O &x)
 }
 void LUdcmp::inverse(MatDoub_O &ainv)
 {
+	// using the stored LU decomposition, return in ainv the matrix inverse.
 	Int i,j;
 	ainv.resize(n,n);
 	for (i=0;i<n;i++) {
