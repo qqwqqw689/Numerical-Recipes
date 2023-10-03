@@ -104,6 +104,7 @@ void LUdcmp::solve(MatDoub_I &b, MatDoub_O &x)
 		for (i=0;i<n;i++) x[i][j] = xx[i];
 	}
 }
+
 void LUdcmp::inverse(MatDoub_O &ainv)
 {
 	// using the stored LU decomposition, return in ainv the matrix inverse.
@@ -115,12 +116,14 @@ void LUdcmp::inverse(MatDoub_O &ainv)
 	}
 	solve(ainv,ainv);
 }
+
 Doub LUdcmp::det()
 {
 	Doub dd = d;
 	for (Int i=0;i<n;i++) dd *= lu[i][i];
 	return dd;
 }
+
 void LUdcmp::mprove(VecDoub_I &b, VecDoub_IO &x)
 {
 	Int i,j;
