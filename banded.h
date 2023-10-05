@@ -1,5 +1,7 @@
 void banmul(MatDoub_I &a, const Int m1, const Int m2, VecDoub_I &x,
 	VecDoub_O &b)
+// Matrix multiply b=A*x,where A is band-diagonal with 
+// m1 rows below the diagonal and m2 rows above.
 {
 	Int i,j,k,tmploop,n=a.nrows();
 	for (i=0;i<n;i++) {
@@ -9,14 +11,21 @@ void banmul(MatDoub_I &a, const Int m1, const Int m2, VecDoub_I &x,
 		for (j=MAX(0,-k);j<tmploop;j++) b[i] += a[i][j]*x[j+k];
 	}
 }
+
+// object for solving linear equation A*x = b for a band-diagonal matrix A
+// LU decomposition 
 struct Bandec {
 	Int n,m1,m2;
 	MatDoub au,al;
+	// the upper and lower triangular matrices are stored in au and al
 	VecInt indx;
+	// stores the row permutation effected by the parital pivoting.
 	Doub d;
-	Bandec(MatDoub_I &a, const int mm1, const int mm2);
-	void solve(VecDoub_I &b, VecDoub_O &x);
-	Doub det();
+	// d is output as +/-1 depending on whether the number of row interchanges
+	// was even or odd;
+	Bandec(MatDoub_I &a, const int mm1, const int mm2); // constructor.
+	void solve(VecDoub_I &b, VecDoub_O &x); // solve a right-hand side vector
+	Doub det(); // return determinant of A
 };
 Bandec::Bandec(MatDoub_I &a, const Int mm1, const Int mm2)
 	: n(a.nrows()), au(a), m1(mm1), m2(mm2), al(n,m1), indx(n)
@@ -26,6 +35,7 @@ Bandec::Bandec(MatDoub_I &a, const Int mm1, const Int mm2)
 	Doub dum;
 	mm=m1+m2+1;
 	l=m1;
+	// rearrange the storgae a bit.
 	for (i=0;i<m1;i++) {
 		for (j=m1-i;j<mm;j++) au[i][j-l]=au[i][j];
 		l--;
