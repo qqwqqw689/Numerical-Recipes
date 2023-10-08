@@ -1,3 +1,5 @@
+#include "nr3.h"
+
 struct Base_interp
 // abstract base class used by all interpolation routines.
 // only the routine interp is called directly by the user.
