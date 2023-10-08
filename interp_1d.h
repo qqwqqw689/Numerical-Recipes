@@ -4,6 +4,7 @@ struct Base_interp
 {
 	Int n, mm, jsav, cor, dj;
 	const Doub *xx, *yy;
+	//cor: indicating whether consecutive calls seem correlated.
 
     // constructor: set up for interpolating on table of x's and y's of length m.
     // normally called by a derived class, not by the user.
@@ -46,37 +47,43 @@ Int Base_interp::locate(const Doub x)
 			ju=jm;
 	}
 	cor = abs(jl-jsav) > dj ? 0 : 1; // decide whether to use hunt or locate next time.
+	// if it sees two callsthat are "close", it anticipates that the next call will 
+	// alse be.
 	jsav = jl;
 	return MAX(0,MIN(n-mm,jl-((mm-2)>>1)));
 }
 
-
 Int Base_interp::hunt(const Doub x)
+// given a value x, return a value j such that x is centered in the subrange
+// xx[j..j+mm-1], where xx is the stored pointer.the values in xx must be monotonic,
+// either increasing or decreasing.
+// 0 <= return value <= n-mm.
 {
 	Int jl=jsav, jm, ju, inc=1;
 	if (n < 2 || mm < 2 || mm > n) throw("hunt size error");
 	Bool ascnd=(xx[n-1] >= xx[0]);
-	if (jl < 0 || jl > n-1) {
+	// true if ascending order of table， false otherwise.
+	if (jl < 0 || jl > n-1) {  // input guess not useful.go immediately to bisection.
 		jl=0;
 		ju=n-1;
 	} else {
-		if (x >= xx[jl] == ascnd) {
+		if (x >= xx[jl] == ascnd) { // hunt up
 			for (;;) {
 				ju = jl + inc;
-				if (ju >= n-1) { ju = n-1; break;}
-				else if (x < xx[ju] == ascnd) break;
-				else {
+				if (ju >= n-1) { ju = n-1; break;} // off end of table.
+				else if (x < xx[ju] == ascnd) break; //found bracket.
+				else { // not done, so double the increment and try again.
 					jl = ju;
 					inc += inc;
 				}
 			}
-		} else {
+		} else { // hunt down
 			ju = jl;
 			for (;;) {
 				jl = jl - inc;
-				if (jl <= 0) { jl = 0; break;}
-				else if (x >= xx[jl] == ascnd) break;
-				else {
+				if (jl <= 0) { jl = 0; break;} // off end of table.
+				else if (x >= xx[jl] == ascnd) break; //found bracket.
+				else { // not done, so double the increment and try again.
 					ju = jl;
 					inc += inc;
 				}
@@ -94,6 +101,7 @@ Int Base_interp::hunt(const Doub x)
 	jsav = jl;
 	return MAX(0,MIN(n-mm,jl-((mm-2)>>1)));
 }
+
 struct Poly_interp : Base_interp
 {
 	Doub dy;
